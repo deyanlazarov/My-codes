@@ -1,0 +1,59 @@
+qvarcomp<-function (datax=x,datay=y,nq){ #predefine X and Y; define nq = number of quantiles
+x1<-sort(datax)
+y1<-sort(datay)
+mx1<-mean(x1)
+my1<-mean(y1)
+probs = seq(0, 1, (1/nq+0.01))
+qx<-quantile(x1, probs = probs)
+qy<-quantile(y1, probs = probs)
+
+s<-rep(0,length(x1))
+d<-rep(0,length(y1))
+
+###X
+for (m in 1:length(x1)){
+  s[m]<-sum((x1[m]-mx1)^2)
+}
+
+ssx<-rep(0,length(probs))
+for (i in 2:length(probs)) {
+  j<-1
+  while (qx[i]>= x1[j]){
+    ssx[i]<-ssx[i]+s[j]
+    j=j+1
+  }
+}
+ssx=ssx/length(x1)
+ssx1=ssx/max(ssx)
+
+###Y
+for (k in 1:length(y1)){
+  d[k]<-sum((y1[k]-my1)^2)  
+}
+
+ssy<-rep(0,length(probs))
+for (f in 2:length(probs)) {
+  r<-1
+  while (qy[f]>=y1[r]){
+    ssy[f]<-ssy[f]+d[r]
+    r=r+1
+  }
+}
+ssy=ssy/length(y1)
+ssy1=ssy/max(ssy)
+
+###Plots 2*1
+par(mfrow = c(2,1))
+ox<-probs
+plot(ox,ssy,pch = ".",main="X~Y comparison", xlab="quantiles", ylab="Cumultive VAR")
+lines(ox,ssy,col="blue")
+lines(ox,ssx,col="red")
+legend("bottomright", c("x", "y"), col = c("red","blue"),bty="n", lty = 1:1,
+       pch = ".", ncol = 2, cex = 0.8)
+
+plot(ox,ssy1,pch = ".",main="X~Y comparison (%VAR)",xlab="quantiles",ylab="% Cumultive VAR")
+lines(ox,ssy1,col="blue")
+lines(ox,ssx1,col="red")
+legend("bottomright", c("x", "y"), col = c("red", "Blue"),bty="n", lty = 1:1,
+       pch = ".", ncol = 2, cex = 0.8)
+}
